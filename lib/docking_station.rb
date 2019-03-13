@@ -11,14 +11,15 @@ class DockingStation
   end
 
   def release_bike
+    fail "Dock is empty!" if empty?
+
 
     x = 0
-    while x <= @bikes.length
-      fail "Dock is empty!" if empty?
+    while x < @bikes.length
       if @bikes[x].broken
-      elsif
-        @bikes.slice!(x)
-
+      else
+        return @bikes[x]
+        break
       end
       x += 1
     end

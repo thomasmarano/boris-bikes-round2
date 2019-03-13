@@ -4,31 +4,33 @@ require 'bike'
 describe DockingStation do
   before(:each) do
     @docking_station = DockingStation.new
+    @bike = double("bike")
+    @second_bike = double("second bike")
   end
 
   describe '#release_bike' do
 
-    it 'raises an error if docking station has no bike' do
-      expect { @docking_station.release_bike }.to raise_error "Dock is empty!"
-    end
+    # it 'raises an error if docking station has no bike' do
+    #   expect { @docking_station.release_bike }.to raise_error "Dock is empty!"
+    # end
 
     it 'responds to release bike' do
       expect(@docking_station).to respond_to(:release_bike)
     end
 
     it 'releases a working bike' do
-      bike = Bike.new
-      @docking_station.dock(bike)
-      expect(bike).to be_working
+      # bike = Bike.new
+      allow(@bike).to receive(:working?).and_return(true)
+      @docking_station.dock(@bike)
+      expect(@bike).to be_working
     end
 
     it 'does not release broken bikes' do
-      bike = Bike.new
-      bike.report_broken
-      second_bike = Bike.new
-      @docking_station.dock(bike)
-      @docking_station.dock(second_bike)
-      expect(@docking_station.release_bike).to eq(second_bike)
+      allow(@bike).to receive(:broken).and_return(true)
+      allow(@second_bike).to receive(:broken).and_return(false)
+      @docking_station.dock(@bike)
+      @docking_station.dock(@second_bike)
+      expect(@docking_station.release_bike).to eq(@second_bike)
     end
 
   end
@@ -40,23 +42,22 @@ describe DockingStation do
     end
 
     it 'docks a bike' do
-      bike = Bike.new
-      @docking_station.dock(bike)
-      expect(@docking_station.bikes).to include(bike)
+      @docking_station.dock(@bike)
+      expect(@docking_station.bikes).to include(@bike)
     end
 
     it 'raises an error if docking station contains full capacity of bikes' do
-      @docking_station.capacity.times { @docking_station.dock(Bike.new)}
-      expect {@docking_station.dock(Bike.new)}.to raise_error "Dock is full!"
+      @docking_station.capacity.times { @docking_station.dock(@bike)}
+      expect {@docking_station.dock(@bike)}.to raise_error "Dock is full!"
     end
 
   end
 
   describe '#bike' do
     it 'tells you if bike is docked' do
-      bike = Bike.new
-      @docking_station.dock(bike)
-      expect(@docking_station.bikes).to include(bike)
+
+      @docking_station.dock(@bike)
+      expect(@docking_station.bikes).to include(@bike)
     end
   end
 
@@ -66,8 +67,8 @@ describe DockingStation do
 
   it 'has a variable capacity' do
     station = DockingStation.new(30)
-    30.times{station.dock(Bike.new)}
-    expect{station.dock(Bike.new)}.to raise_error "Dock is full!"
+    30.times{station.dock(@bike)}
+    expect{station.dock(@bike)}.to raise_error "Dock is full!"
   end
 
 
